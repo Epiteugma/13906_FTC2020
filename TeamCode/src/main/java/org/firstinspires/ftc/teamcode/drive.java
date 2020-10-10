@@ -25,7 +25,7 @@ public class drive extends LinearOpMode {
     private DcMotor fr = null;
     private double sidepowerfactor = 0.7;
     private double forwardpowerfactor = 0.6;
-    private double turnpowerfactor = 0.45;
+    private double turnpowerfactor = 0.47;
 
 
     /*

@@ -10,7 +10,7 @@ public class autonomous extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         final DcMotor fl = hardwareMap.get(DcMotor.class, "front_left");
-        final DcMotor fr = hardwareMap.get(DcMotor.class, "back_left");
+        final DcMotor fr = hardwareMap.get(DcMotor.class, "front_right");
         final DcMotor bl = hardwareMap.get(DcMotor.class, "back_left");
         final DcMotor br = hardwareMap.get(DcMotor.class, "back_right");
 
