@@ -3,13 +3,17 @@ package org.firstinspires.ftc.teamcode;
 
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import java.lang.Runnable;
@@ -22,6 +26,8 @@ import java.util.Locale;
 
 public class drive extends LinearOpMode {
 
+
+
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor fl = null;
@@ -33,13 +39,22 @@ public class drive extends LinearOpMode {
     private double turnpowerfactor = 0.47;
     BNO055IMU imu;
     Orientation angles;
-
+    Acceleration gravity;
     /*
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void runOpMode() {
-        imu = hardwareMap.get(BNO055IMU.class, "IMU");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
         telemetry.addData("Status", "Initialized");
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
@@ -62,6 +77,8 @@ public class drive extends LinearOpMode {
 
         waitForStart();
         Thread drivethread = new Thread(driver);
+        Thread imuthread = new Thread(imuRead);
+        imuthread.start();
         drivethread.start();
         while (opModeIsActive()) {
 
@@ -91,6 +108,17 @@ public class drive extends LinearOpMode {
         }
 
 
+    };
+
+    Runnable imuRead = new Runnable() {
+        @Override
+        public void run() {
+            while (opModeIsActive()) {
+                angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+                telemetry.addLine() .addData("Z Coordinate (Rotation)", formatAngle(AngleUnit.DEGREES, angles.firstAngle));
+                telemetry.update();
+            }
+        }
     };
 
     /////////////////////////////////////
