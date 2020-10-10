@@ -92,7 +92,7 @@ public class SensorBNO055IMU extends LinearOpMode
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-        // Set up our telemetry dashboard
+        // Set up composeTelemetry();our telemetry dashboard
         composeTelemetry();
 
         // Wait until we're told to go
