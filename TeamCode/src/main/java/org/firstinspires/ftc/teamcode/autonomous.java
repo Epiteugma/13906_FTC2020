@@ -1,15 +1,24 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.drawable.GradientDrawable;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
+import java.util.Locale;
+
 @Autonomous(name = "Autonomous Test", group = "FTC_Cyprus_2020-21")
 public class autonomous extends LinearOpMode {
     BNO055IMU imu;
-
+    Orientation angles;
     @Override
     public void runOpMode() throws InterruptedException {
         // Set up the parameters with which we will use our IMU. Note that integration
@@ -45,6 +54,10 @@ public class autonomous extends LinearOpMode {
                 fr.setPower(0);
                 bl.setPower(0);
                 br.setPower(0);
+                telemetry.addLine();
+                angles = imu.getAngularOrientation();
+
+                telemetry.addData("XYZ: ", angles);
             }
         };
         Thread thread1 = new Thread(test);
@@ -54,4 +67,15 @@ public class autonomous extends LinearOpMode {
         }
     }
 
+    /////////////////////////////////////
+    //            FORMATTING           //
+    /////////////////////////////////////
+
+    String formatAngle(AngleUnit angleUnit, double angle) {
+        return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
+    }
+
+    String formatDegrees(double degrees){
+        return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
+    }
 }
