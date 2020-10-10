@@ -70,7 +70,7 @@ public class drive extends LinearOpMode {
                 // Read controller variables
                 double forwardpower = -gamepad1.left_stick_y * forwardpowerfactor;
                 double sidepower = gamepad1.left_stick_x * sidepowerfactor;
-                double turnpower = gamepad1.right_stick_x * turnpowerfactor;
+                double turnpower = gamepad1.right_stick_x * turnpowerfactor * -1;
 
                 // Calculate DC Motor Power.
                 fl.setPower((forwardpower + sidepower + turnpower));
