@@ -28,6 +28,7 @@ public class drive extends LinearOpMode {
     private double turnpowerfactor = 0.47;
 
 
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -41,7 +42,7 @@ public class drive extends LinearOpMode {
         fr = hardwareMap.get(DcMotor.class, "front_right");
         bl = hardwareMap.get(DcMotor.class, "back_left");
         br = hardwareMap.get(DcMotor.class, "back_right");
-
+        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
 //        leftDrive.setDirection(DcMotor.Direction.FORWARD);

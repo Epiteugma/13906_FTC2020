@@ -19,9 +19,9 @@ public class autonomous extends LinearOpMode {
             @Override
             public void run() {
                 fl.setPower(0.5);
-                fr.setPower(0.5);
+                fr.setPower(-0.5);
                 bl.setPower(0.5);
-                br.setPower(0.5);
+                br.setPower(-0.5);
                 try {Thread.sleep(1000);}
                 catch (Exception e) {}
                 fl.setPower(0);
