@@ -121,6 +121,15 @@ public class drive extends LinearOpMode {
         }
     };
 
+    Runnable factorGearbox = new Runnable() {
+        @Override
+        public void run() {
+            while (opModeIsActive()) {
+
+            }
+        }
+    };
+    
     /////////////////////////////////////
     //            FORMATTING           //
     /////////////////////////////////////
