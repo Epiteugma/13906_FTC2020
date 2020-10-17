@@ -125,14 +125,14 @@ public class drive extends LinearOpMode {
         @Override
         public void run() {
             while (opModeIsActive()) {
-                while(gamepad1.left_stick_y == 1 || gamepad1.left_stick_x == 1) {
+                while(gamepad1.left_stick_y == 1) {
                     if(forwardpowerfactor != 1) {
                         forwardpowerfactor += 0.1;
                     }
                     try{Thread.sleep(500);}
                     catch (Exception e) {}
                 }
-                while(gamepad1.left_stick_y == -1 || gamepad1.left_stick_y == -1) {
+                while(gamepad1.left_stick_y == -1) {
                     if(forwardpowerfactor != 0) {
                         forwardpowerfactor -= 0.1;
                     }
