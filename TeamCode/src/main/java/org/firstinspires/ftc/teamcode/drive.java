@@ -36,7 +36,7 @@ public class drive extends LinearOpMode {
     private DcMotor br = null;
     private DcMotor fr = null;
     private double sidepowerfactor = 1;
-    private double forwardpowerfactor = 1;
+    private double forwardpowerfactor = 0.85;
     private double turnpowerfactor = 0.7;
     BNO055IMU imu;
     Orientation angles;
