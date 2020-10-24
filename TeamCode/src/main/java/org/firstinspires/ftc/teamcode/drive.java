@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import java.util.*;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -34,9 +35,9 @@ public class drive extends LinearOpMode {
     private DcMotor bl = null;
     private DcMotor br = null;
     private DcMotor fr = null;
-    private double sidepowerfactor = 0.7;
-    private double forwardpowerfactor = 0.6;
-    private double turnpowerfactor = 0.47;
+    private double sidepowerfactor = 1;
+    private double forwardpowerfactor = 1;
+    private double turnpowerfactor = 0.7;
     BNO055IMU imu;
     Orientation angles;
     Acceleration gravity;
@@ -94,10 +95,11 @@ public class drive extends LinearOpMode {
         @Override
         public void run() {
             while (opModeIsActive()) {
+
                 // Read controller variables
-                double forwardpower = -gamepad1.left_stick_y * forwardpowerfactor;
-                double sidepower = gamepad1.left_stick_x * sidepowerfactor;
-                double turnpower = gamepad1.right_stick_x * turnpowerfactor * -1;
+                double forwardpower =  Math.sin(gamepad1.left_stick_y*Math.PI/2) * forwardpowerfactor;
+                double sidepower = Math.sin(-gamepad1.left_stick_x*Math.PI/2) * sidepowerfactor;
+                double turnpower = Math.sin(-gamepad1.right_stick_x *Math.PI/2) * turnpowerfactor;
 
                 // Calculate DC Motor Power.
                 fl.setPower((forwardpower + sidepower + turnpower));
@@ -117,28 +119,6 @@ public class drive extends LinearOpMode {
                 angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
                 telemetry.addLine() .addData("Z Coordinate (Rotation)", formatAngle(AngleUnit.DEGREES, angles.firstAngle));
                 telemetry.update();
-            }
-        }
-    };
-
-    Runnable factorGearbox = new Runnable() {
-        @Override
-        public void run() {
-            while (opModeIsActive()) {
-                while(gamepad1.left_stick_y == 1) {
-                    if(forwardpowerfactor != 1) {
-                        forwardpowerfactor += 0.1;
-                    }
-                    try{Thread.sleep(500);}
-                    catch (Exception e) {}
-                }
-                while(gamepad1.left_stick_y == -1) {
-                    if(forwardpowerfactor != 0) {
-                        forwardpowerfactor -= 0.1;
-                    }
-                    try{Thread.sleep(500);}
-                    catch (Exception e) {}
-                }
             }
         }
     };
