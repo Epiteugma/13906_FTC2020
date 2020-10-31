@@ -85,6 +85,8 @@ public class drive extends LinearOpMode {
         Thread collectorToggleThread = new Thread(toggleCollector);
         gearboxAthread.start();
         gearboxYthread.start();
+        collectorRunThread.start();
+        collectorToggleThread.start();
         imuthread.start();
         drivethread.start();
         while (opModeIsActive()) {
