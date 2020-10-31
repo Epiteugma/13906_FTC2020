@@ -6,3 +6,4 @@ Progress Tracker:
 - "Gearbox" mechanism support ✅
 - Collector mechanism support ✅
 - Shooting mechanism support ❌ 
+- Autonomous mode (30s) ❌
