@@ -79,6 +79,10 @@ public class drive extends LinearOpMode {
         waitForStart();
         Thread drivethread = new Thread(driver);
         Thread imuthread = new Thread(imuRead);
+        Thread gearboxYthread = new Thread(gearboxY);
+        Thread gearboxAthread = new Thread(gearboxA);
+        gearboxAthread.start();
+        gearboxYthread.start();
         imuthread.start();
         drivethread.start();
         while (opModeIsActive()) {
@@ -122,7 +126,45 @@ public class drive extends LinearOpMode {
             }
         }
     };
-    
+
+    Runnable gearboxY = new Runnable() {
+        @Override
+        public void run() {
+            while (opModeIsActive()) {
+                if(gamepad1.y) {
+                    boolean ranFirstTime = false;
+                    if ((forwardpowerfactor + 0.1) < 1) {
+                        forwardpowerfactor += 0.1;
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    Runnable gearboxA = new Runnable() {
+        @Override
+        public void run() {
+            while (opModeIsActive()) {
+                if(gamepad1.a) {
+                    boolean ranFirstTime = false;
+                    if ((forwardpowerfactor - 0.1) < 1) {
+                        forwardpowerfactor -= 0.1;
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     /////////////////////////////////////
     //            FORMATTING           //
     /////////////////////////////////////
