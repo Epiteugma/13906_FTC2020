@@ -81,6 +81,8 @@ public class drive extends LinearOpMode {
         Thread imuthread = new Thread(imuRead);
         Thread gearboxYthread = new Thread(gearboxY);
         Thread gearboxAthread = new Thread(gearboxA);
+        Thread collectorRunThread = new Thread(runCollector);
+        Thread collectorToggleThread = new Thread(toggleCollector);
         gearboxAthread.start();
         gearboxYthread.start();
         imuthread.start();
@@ -159,6 +161,40 @@ public class drive extends LinearOpMode {
                         } catch (InterruptedException e) {
 
                         }
+                    }
+                }
+            }
+        }
+    };
+    boolean collectorIsEnabled = false;
+    Runnable runCollector = new Runnable() {
+        @Override
+        public void run() {
+            while(opModeIsActive()) {
+                if (collectorIsEnabled) {
+                    hardwareMap.get(DcMotor.class, "collector").setPower(1.0);
+                }
+                else {
+                    hardwareMap.get(DcMotor.class, "collector").setPower(0);
+                }
+            }
+        }
+    };
+
+    Runnable toggleCollector = new Runnable() {
+        @Override
+        public void run() {
+            while (opModeIsActive()) {
+                if (gamepad2.x) {
+                    if (collectorIsEnabled) {
+                        collectorIsEnabled = false;
+                    } else {
+                        collectorIsEnabled = true;
+                    }
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
             }
