@@ -174,7 +174,7 @@ public class drive extends LinearOpMode {
         public void run() {
             while(opModeIsActive()) {
                 if (collectorIsEnabled) {
-                    hardwareMap.get(DcMotor.class, "collector").setPower(1.0);
+                    hardwareMap.get(DcMotor.class, "collector").setPower(-1.0);
                 }
                 else {
                     hardwareMap.get(DcMotor.class, "collector").setPower(0);
