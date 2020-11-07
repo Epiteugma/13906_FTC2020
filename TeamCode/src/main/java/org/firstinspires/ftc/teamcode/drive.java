@@ -91,6 +91,9 @@ public class drive extends LinearOpMode {
         Thread collectorToggleThread = new Thread(toggleCollector);
         Thread shooterRunThread = new Thread(runshooter);
         Thread shooterToggleThread = new Thread(toggleshooter);
+        Thread shootThread = new Thread(shoot);
+        shootThread.start();
+        shooterRunThread.start();
         gearboxAthread.start();
         gearboxYthread.start();
         collectorRunThread.start();
