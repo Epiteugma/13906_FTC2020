@@ -58,7 +58,7 @@ public class drive extends LinearOpMode {
         parameters.loggingTag          = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         collector = hardwareMap.get(DcMotor.class, "collector");
-        shooterLoader = hardwareMap.get(Servo.class, "servoloader");
+        shooterLoader = hardwareMap.get(Servo.class, "shooterloader");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
         telemetry.addData("Status", "Initialized");
