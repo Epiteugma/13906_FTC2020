@@ -38,6 +38,7 @@ public class drive extends LinearOpMode {
     private double sidepowerfactor = 0.75;
     private double forwardpowerfactor = 0.85;
     private double turnpowerfactor = 0.7;
+    private DcMotor collector = null;
     BNO055IMU imu;
     Orientation angles;
     Acceleration gravity;
@@ -53,7 +54,7 @@ public class drive extends LinearOpMode {
         parameters.loggingEnabled      = true;
         parameters.loggingTag          = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
+        collector = hardwareMap.get(DcMotor.class, "collector");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
         telemetry.addData("Status", "Initialized");
@@ -174,10 +175,10 @@ public class drive extends LinearOpMode {
         public void run() {
             while(opModeIsActive()) {
                 if (collectorIsEnabled) {
-                    hardwareMap.get(DcMotor.class, "collector").setPower(-1.0);
+                    collector.setPower(-1.0);
                 }
                 else {
-                    hardwareMap.get(DcMotor.class, "collector").setPower(0);
+                    collector.setPower(0);
                 }
             }
         }
