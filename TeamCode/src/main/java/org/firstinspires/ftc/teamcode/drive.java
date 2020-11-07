@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.*;
 
@@ -35,6 +36,7 @@ public class drive extends LinearOpMode {
     private DcMotor bl = null;
     private DcMotor br = null;
     private DcMotor fr = null;
+    private Servo shooterLoader = null;
     private double sidepowerfactor = 0.75;
     private double forwardpowerfactor = 0.85;
     private double turnpowerfactor = 0.7;
@@ -56,6 +58,7 @@ public class drive extends LinearOpMode {
         parameters.loggingTag          = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         collector = hardwareMap.get(DcMotor.class, "collector");
+        shooterLoader = hardwareMap.get(Servo.class, "servoloader");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
         telemetry.addData("Status", "Initialized");
@@ -239,6 +242,23 @@ public class drive extends LinearOpMode {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                }
+            }
+        }
+    };
+
+    Runnable shoot = new Runnable() {
+        @Override
+        public void run() {
+            while (opModeIsActive()) {
+                if(gamepad2.a) {
+                    shooter.setTargetPosition(shooter.getCurrentPosition()+30);
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    shooter.setTargetPosition(shooter.getCurrentPosition()-30);
                 }
             }
         }
