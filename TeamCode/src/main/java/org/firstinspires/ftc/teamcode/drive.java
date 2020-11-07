@@ -39,6 +39,7 @@ public class drive extends LinearOpMode {
     private double forwardpowerfactor = 0.85;
     private double turnpowerfactor = 0.7;
     private DcMotor collector = null;
+    private DcMotor shooter=null;
     BNO055IMU imu;
     Orientation angles;
     Acceleration gravity;
@@ -65,6 +66,7 @@ public class drive extends LinearOpMode {
         fr = hardwareMap.get(DcMotor.class, "front_right");
         bl = hardwareMap.get(DcMotor.class, "back_left");
         br = hardwareMap.get(DcMotor.class, "back_right");
+        shooter = hardwareMap.get(DcMotor.class, "shooter");
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -84,10 +86,14 @@ public class drive extends LinearOpMode {
         Thread gearboxAthread = new Thread(gearboxA);
         Thread collectorRunThread = new Thread(runCollector);
         Thread collectorToggleThread = new Thread(toggleCollector);
+        Thread shooterRunThread = new Thread(runshooter);
+        Thread shooterToggleThread = new Thread(toggleshooter);
         gearboxAthread.start();
         gearboxYthread.start();
         collectorRunThread.start();
         collectorToggleThread.start();
+        shooterRunThread.start();
+        shooterToggleThread.start();
         imuthread.start();
         drivethread.start();
         while (opModeIsActive()) {
@@ -193,6 +199,40 @@ public class drive extends LinearOpMode {
                         collectorIsEnabled = false;
                     } else {
                         collectorIsEnabled = true;
+                    }
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    };
+    boolean shooterIsEnabled = false;
+    Runnable runshooter = new Runnable() {
+        @Override
+        public void run() {
+            while(opModeIsActive()) {
+                if (shooterIsEnabled) {
+                    shooter.setPower(-1.0);
+                }
+                else {
+                   shooter.setPower(0);
+                }
+            }
+        }
+    };
+
+    Runnable toggleshooter = new Runnable() {
+        @Override
+        public void run() {
+            while (opModeIsActive()) {
+                if (gamepad2.y) {
+                    if (shooterIsEnabled) {
+                        shooterIsEnabled = false;
+                    } else {
+                        shooterIsEnabled = true;
                     }
                     try {
                         Thread.sleep(250);
