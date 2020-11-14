@@ -37,9 +37,7 @@ public class drive extends LinearOpMode {
     private DcMotor br = null;
     private DcMotor fr = null;
     private Servo shooterLoader = null;
-    private double sidepowerfactor = 0.75;
-    private double forwardpowerfactor = 0.85;
-    private double turnpowerfactor = 0.7;
+    private double globalpowerfactor = 0.85;
     private DcMotor collector = null;
     private DcMotor shooter=null;
     BNO055IMU imu;
@@ -70,6 +68,7 @@ public class drive extends LinearOpMode {
         bl = hardwareMap.get(DcMotor.class, "back_left");
         br = hardwareMap.get(DcMotor.class, "back_right");
         shooter = hardwareMap.get(DcMotor.class, "shooter");
+        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -83,188 +82,158 @@ public class drive extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
 
         waitForStart();
-        Thread drivethread = new Thread(driver);
-        Thread imuthread = new Thread(imuRead);
-        Thread gearboxYthread = new Thread(gearboxY);
-        Thread gearboxAthread = new Thread(gearboxA);
-        Thread collectorRunThread = new Thread(runCollector);
-        Thread collectorToggleThread = new Thread(toggleCollector);
-        Thread shooterRunThread = new Thread(runshooter);
-        Thread shooterToggleThread = new Thread(toggleshooter);
-        Thread shootThread = new Thread(shoot);
-        shootThread.start();
-        gearboxAthread.start();
-        gearboxYthread.start();
-        collectorRunThread.start();
-        collectorToggleThread.start();
-        shooterRunThread.start();
-        shooterToggleThread.start();
-        imuthread.start();
-        drivethread.start();
+        //Thread imuthread = new Thread(imuRead);
+        //imuthread.start();
+        Thread shooterThread = new Thread(shooterRun);
+        Thread collectorThread = new Thread(collectRun);
+        Thread driveThread = new Thread(driverRun);
+        driveThread.start();
+        collectorThread.start();
+        shooterThread.start();
         while (opModeIsActive()) {
 
         }
 
         /*
-         * Code to run ONCE after the driver hits STOP
+         * Code to run ONCE after the driver hits STOP.
          */
 
     }
 
-    Runnable driver = new Runnable() {
+    Runnable driverRun = new Runnable() {
         @Override
         public void run() {
+            long prevTime = 0;
             while (opModeIsActive()) {
 
-                // Read controller variables
-                double forwardpower =  Math.sin(gamepad1.left_stick_y*Math.PI/2) * forwardpowerfactor;
-                double sidepower = Math.sin(-gamepad1.left_stick_x*Math.PI/2) * sidepowerfactor;
-                double turnpower = Math.sin(-gamepad1.right_stick_x *Math.PI/2) * turnpowerfactor;
+                // Read controller variables.
+                double forwardpower =  Math.sin(gamepad1.left_stick_y*Math.PI/2) * globalpowerfactor;
+                double sidepower = Math.sin(-gamepad1.left_stick_x*Math.PI/2) * globalpowerfactor;
+                double turnpower = Math.sin(-gamepad1.right_stick_x *Math.PI/2) * globalpowerfactor;
 
                 // Calculate DC Motor Power.
                 fl.setPower((forwardpower + sidepower + turnpower));
                 bl.setPower((forwardpower - sidepower + turnpower));
                 fr.setPower(-(forwardpower - sidepower - turnpower));
                 br.setPower(-(forwardpower + sidepower - turnpower));
+
+                // Do gearbox increase.
+                if(gamepad1.y&&(System.currentTimeMillis()-500>prevTime)) {
+                    prevTime = System.currentTimeMillis();
+                    if ((globalpowerfactor + 0.1) < 1) {
+                        globalpowerfactor += 0.1;
+                    }
+                }
+
+
+
+                if(gamepad1.a&&(System.currentTimeMillis()-500>prevTime)) {
+                    prevTime = System.currentTimeMillis();
+                    if ((globalpowerfactor - 0.1) > 0) {
+                        globalpowerfactor -= 0.1;
+                    }
+                }
             }
         }
 
 
     };
 
-    Runnable imuRead = new Runnable() {
+    /*Runnable imuRead = new Runnable() {
         @Override
-        public void run() {
+        public void run() {                            // mAke function
             while (opModeIsActive()) {
                 angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
                 telemetry.addLine() .addData("Z Coordinate (Rotation)", formatAngle(AngleUnit.DEGREES, angles.firstAngle));
                 telemetry.update();
             }
         }
-    };
+    };*/
 
-    Runnable gearboxY = new Runnable() {
+    Runnable collectRun = new Runnable() {
         @Override
         public void run() {
-            while (opModeIsActive()) {
-                if(gamepad1.y) {
-                    boolean ranFirstTime = false;
-                    if ((forwardpowerfactor + 0.1) < 1) {
-                        forwardpowerfactor += 0.1;
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-
-                        }
-                    }
-                }
-            }
-        }
-    };
-
-    Runnable gearboxA = new Runnable() {
-        @Override
-        public void run() {
-            while (opModeIsActive()) {
-                if(gamepad1.a) {
-                    boolean ranFirstTime = false;
-                    if ((forwardpowerfactor - 0.1) < 1) {
-                        forwardpowerfactor -= 0.1;
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-
-                        }
-                    }
-                }
-            }
-        }
-    };
-    boolean collectorIsEnabled = false;
-    Runnable runCollector = new Runnable() {
-        @Override
-        public void run() {
+            boolean collectorIsEnabled = false;
+            CollectorDirection collectorDirection = null;
+            long prevTime = 0;
             while(opModeIsActive()) {
-                if (collectorIsEnabled) {
-                    collector.setPower(-1.0);
+                // Set collector power.
+                if(collectorIsEnabled) {
+                    if(collectorDirection == CollectorDirection.BACK) {
+                        collector.setPower(1);
+                    } else if (collectorDirection == CollectorDirection.FORWARD) {
+                        collector.setPower(-1);
+                    } else {
+                        collector.setPower(0);
+                    }
                 }
                 else {
                     collector.setPower(0);
                 }
-            }
-        }
-    };
 
-    Runnable toggleCollector = new Runnable() {
-        @Override
-        public void run() {
-            while (opModeIsActive()) {
-                if (gamepad2.x) {
-                    if (collectorIsEnabled) {
-                        collectorIsEnabled = false;
-                    } else {
+                // Do collector toggles.
+                if(gamepad2.x&&(System.currentTimeMillis()-500>prevTime)) {
+                    prevTime = System.currentTimeMillis();
+                    if(collectorDirection == CollectorDirection.BACK) {
+                        if(collectorIsEnabled) {
+                            collectorIsEnabled = false;
+                        }
+                        else {
+                            collectorIsEnabled = true;
+                        }
+                    }
+                    else {
+                        collectorDirection = CollectorDirection.BACK;
                         collectorIsEnabled = true;
                     }
-                    try {
-                        Thread.sleep(250);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                }
+
+                if(gamepad2.b&&(System.currentTimeMillis()-500>prevTime)) {
+                    prevTime = System.currentTimeMillis();
+                    if(collectorDirection == CollectorDirection.FORWARD) {
+                        if(collectorIsEnabled) {
+                            collectorIsEnabled = false;
+                        }
+                        else {
+                            collectorIsEnabled = true;
+                        }
                     }
+                    else {
+                        collectorDirection = CollectorDirection.FORWARD;
+                        collectorIsEnabled = true;
+                    }
+
                 }
             }
         }
     };
-    boolean shooterIsEnabled = false;
-    Runnable runshooter = new Runnable() {
+
+    Runnable shooterRun = new Runnable() {
         @Override
         public void run() {
+            long prevTime = 0;
+            boolean shooterIsEnabled = false;
             while(opModeIsActive()) {
-                if (shooterIsEnabled) {
-                    shooter.setPower(-1.0);
+                if(shooterIsEnabled) {
+                    shooter.setPower(1);
                 }
                 else {
-                   shooter.setPower(0);
+                    shooter.setPower(0);
+                }
+
+                if(gamepad2.left_bumper&&(System.currentTimeMillis()-500 > prevTime)) {
+                    prevTime = System.currentTimeMillis();
+                    shooterIsEnabled = false;
+                }
+
+                if(gamepad2.right_bumper&&(System.currentTimeMillis()-500 > prevTime)) {
+                    prevTime = System.currentTimeMillis();
+                    shooterIsEnabled = true;
                 }
             }
         }
     };
 
-    Runnable toggleshooter = new Runnable() {
-        @Override
-        public void run() {
-            while (opModeIsActive()) {
-                if (gamepad2.y) {
-                    if (shooterIsEnabled) {
-                        shooterIsEnabled = false;
-                    } else {
-                        shooterIsEnabled = true;
-                    }
-                    try {
-                        Thread.sleep(250);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    };
-
-    Runnable shoot = new Runnable() {
-        @Override
-        public void run() {
-            while (opModeIsActive()) {
-                if(gamepad2.a) {
-                    shooter.setTargetPosition(shooter.getCurrentPosition()+30);
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    shooter.setTargetPosition(shooter.getCurrentPosition()-30);
-                }
-            }
-        }
-    };
 
     /////////////////////////////////////
     //            FORMATTING           //
@@ -277,5 +246,10 @@ public class drive extends LinearOpMode {
     String formatDegrees(double degrees){
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
-}
 
+    /*private double calculateshooterpower(long timeprevioustick,long currenttick,double ticksprerotation,double targetrpm){
+        long timeinterval = currenttick - timeprevioustick;
+        long expectedtimeinterval = targetrpm
+
+    }*/
+}
