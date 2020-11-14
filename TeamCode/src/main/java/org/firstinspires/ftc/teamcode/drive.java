@@ -29,7 +29,6 @@ import java.util.Locale;
 public class drive extends LinearOpMode {
 
 
-
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor fl = null;
@@ -37,23 +36,24 @@ public class drive extends LinearOpMode {
     private DcMotor br = null;
     private DcMotor fr = null;
     private Servo shooterLoader = null;
-    private double globalpowerfactor = 0.85;
+    private double globalpowerfactor = 0.8;
     private DcMotor collector = null;
-    private DcMotor shooter=null;
+    private DcMotor shooter = null;
     BNO055IMU imu;
     Orientation angles;
     Acceleration gravity;
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void runOpMode() {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         collector = hardwareMap.get(DcMotor.class, "collector");
         shooterLoader = hardwareMap.get(Servo.class, "shooterloader");
@@ -69,6 +69,7 @@ public class drive extends LinearOpMode {
         br = hardwareMap.get(DcMotor.class, "back_right");
         shooter = hardwareMap.get(DcMotor.class, "shooter");
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        collector.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -92,12 +93,12 @@ public class drive extends LinearOpMode {
         shooterThread.start();
         while (opModeIsActive()) {
 
+
+            /*
+             * Code to run ONCE after the driver hits STOP.
+             */
+
         }
-
-        /*
-         * Code to run ONCE after the driver hits STOP.
-         */
-
     }
 
     Runnable driverRun = new Runnable() {
@@ -107,9 +108,9 @@ public class drive extends LinearOpMode {
             while (opModeIsActive()) {
 
                 // Read controller variables.
-                double forwardpower =  Math.sin(gamepad1.left_stick_y*Math.PI/2) * globalpowerfactor;
-                double sidepower = Math.sin(-gamepad1.left_stick_x*Math.PI/2) * globalpowerfactor;
-                double turnpower = Math.sin(-gamepad1.right_stick_x *Math.PI/2) * globalpowerfactor;
+                double forwardpower = Math.sin(gamepad1.left_stick_y * Math.PI / 2) * globalpowerfactor;
+                double sidepower = Math.sin(-gamepad1.left_stick_x * Math.PI / 2) * globalpowerfactor;
+                double turnpower = Math.sin(-gamepad1.right_stick_x * Math.PI / 2) * globalpowerfactor;
 
                 // Calculate DC Motor Power.
                 fl.setPower((forwardpower + sidepower + turnpower));
@@ -118,7 +119,7 @@ public class drive extends LinearOpMode {
                 br.setPower(-(forwardpower + sidepower - turnpower));
 
                 // Do gearbox increase.
-                if(gamepad1.y&&(System.currentTimeMillis()-500>prevTime)) {
+                if (gamepad1.y && (System.currentTimeMillis() - 500 > prevTime)) {
                     prevTime = System.currentTimeMillis();
                     if ((globalpowerfactor + 0.1) < 1) {
                         globalpowerfactor += 0.1;
@@ -126,8 +127,7 @@ public class drive extends LinearOpMode {
                 }
 
 
-
-                if(gamepad1.a&&(System.currentTimeMillis()-500>prevTime)) {
+                if (gamepad1.a && (System.currentTimeMillis() - 500 > prevTime)) {
                     prevTime = System.currentTimeMillis();
                     if ((globalpowerfactor - 0.1) > 0) {
                         globalpowerfactor -= 0.1;
@@ -156,49 +156,52 @@ public class drive extends LinearOpMode {
             boolean collectorIsEnabled = false;
             CollectorDirection collectorDirection = null;
             long prevTime = 0;
-            while(opModeIsActive()) {
+            while (opModeIsActive()) {
                 // Set collector power.
-                if(collectorIsEnabled) {
-                    if(collectorDirection == CollectorDirection.BACK) {
+                if (collectorIsEnabled) {
+                    if (collectorDirection == CollectorDirection.BACK) {
                         collector.setPower(1);
+//                        long prevpostime = System.currentTimeMillis();
+//                        int prevpos = collector.getCurrentPosition();
+//                        if (collector.getCurrentPosition() > prevpos) {
+//                            double collectrpower = calculateshooterpower(prevpostime, System.currentTimeMillis(), 288, 70, 0.1, 0.5);
+//                            collector.setPower(collectrpower);
+//                            prevpos = collector.getCurrentPosition();
+//                            prevpostime = System.currentTimeMillis();
+//                        }
                     } else if (collectorDirection == CollectorDirection.FORWARD) {
                         collector.setPower(-1);
                     } else {
                         collector.setPower(0);
                     }
-                }
-                else {
+                } else {
                     collector.setPower(0);
                 }
 
                 // Do collector toggles.
-                if(gamepad2.x&&(System.currentTimeMillis()-500>prevTime)) {
+                if (gamepad2.x && (System.currentTimeMillis() - 500 > prevTime)) {
                     prevTime = System.currentTimeMillis();
-                    if(collectorDirection == CollectorDirection.BACK) {
-                        if(collectorIsEnabled) {
+                    if (collectorDirection == CollectorDirection.BACK) {
+                        if (collectorIsEnabled) {
                             collectorIsEnabled = false;
-                        }
-                        else {
+                        } else {
                             collectorIsEnabled = true;
                         }
-                    }
-                    else {
+                    } else {
                         collectorDirection = CollectorDirection.BACK;
                         collectorIsEnabled = true;
                     }
                 }
 
-                if(gamepad2.b&&(System.currentTimeMillis()-500>prevTime)) {
+                if (gamepad2.b && (System.currentTimeMillis() - 500 > prevTime)) {
                     prevTime = System.currentTimeMillis();
-                    if(collectorDirection == CollectorDirection.FORWARD) {
-                        if(collectorIsEnabled) {
+                    if (collectorDirection == CollectorDirection.FORWARD) {
+                        if (collectorIsEnabled) {
                             collectorIsEnabled = false;
-                        }
-                        else {
+                        } else {
                             collectorIsEnabled = true;
                         }
-                    }
-                    else {
+                    } else {
                         collectorDirection = CollectorDirection.FORWARD;
                         collectorIsEnabled = true;
                     }
@@ -213,20 +216,19 @@ public class drive extends LinearOpMode {
         public void run() {
             long prevTime = 0;
             boolean shooterIsEnabled = false;
-            while(opModeIsActive()) {
-                if(shooterIsEnabled) {
+            while (opModeIsActive()) {
+                if (shooterIsEnabled) {
                     shooter.setPower(1);
-                }
-                else {
+                } else {
                     shooter.setPower(0);
                 }
 
-                if(gamepad2.left_bumper&&(System.currentTimeMillis()-500 > prevTime)) {
+                if (gamepad2.left_bumper && (System.currentTimeMillis() - 500 > prevTime)) {
                     prevTime = System.currentTimeMillis();
                     shooterIsEnabled = false;
                 }
 
-                if(gamepad2.right_bumper&&(System.currentTimeMillis()-500 > prevTime)) {
+                if (gamepad2.right_bumper && (System.currentTimeMillis() - 500 > prevTime)) {
                     prevTime = System.currentTimeMillis();
                     shooterIsEnabled = true;
                 }
@@ -243,13 +245,16 @@ public class drive extends LinearOpMode {
         return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
     }
 
-    String formatDegrees(double degrees){
+    String formatDegrees(double degrees) {
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
-
-    /*private double calculateshooterpower(long timeprevioustick,long currenttick,double ticksprerotation,double targetrpm){
-        long timeinterval = currenttick - timeprevioustick;
-        long expectedtimeinterval = targetrpm
-
-    }*/
+        double calculateshooterpower( long timeprevioustick, long currenttick, long ticksprerotation, long targetrpm, double p, double basespeed){
+            long timeinterval = currenttick - timeprevioustick;
+            long expectedtimeinterval = 60 / (targetrpm * ticksprerotation);
+            long error = expectedtimeinterval - timeinterval;
+            double connrection = p * error;
+            double outputpower = basespeed + connrection;
+            return outputpower;
+        }
 }
+
