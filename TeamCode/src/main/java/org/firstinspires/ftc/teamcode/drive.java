@@ -1,13 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
-
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.*;
@@ -20,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import java.lang.Runnable;
 import java.util.Locale;
+
 
 
 @TeleOp(name="Basic: Iterative OpMode", group="FTC_Cyprus_2020-21")
@@ -35,7 +36,7 @@ public class drive extends LinearOpMode {
     private DcMotor bl = null;
     private DcMotor br = null;
     private DcMotor fr = null;
-    private Servo shooterLoader = null;
+    private CRServo shooterLoader = null;
     private double globalpowerfactor = 0.8;
     private DcMotor collector = null;
     private DcMotor shooter = null;
@@ -59,8 +60,7 @@ public class drive extends LinearOpMode {
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         collector = hardwareMap.get(DcMotor.class, "collector");
-        shooterLoader = hardwareMap.get(Servo.class, "shooterLoader");
-        shooterLoader.setPosition(SLHOME);
+        shooterLoader = hardwareMap.get(CRServo.class, "shooterLoader");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
         telemetry.addData("Status", "Initialized");
@@ -92,11 +92,9 @@ public class drive extends LinearOpMode {
         Thread shooterThread = new Thread(shooterRun);
         Thread collectorThread = new Thread(collectRun);
         Thread driveThread = new Thread(driverRun);
-        Thread shooterLoaderThread = new Thread(shooterLoaderRun);
         driveThread.start();
         collectorThread.start();
         shooterThread.start();
-        shooterLoaderThread.start();
         while (opModeIsActive()) {
 
 
@@ -222,6 +220,7 @@ public class drive extends LinearOpMode {
         @Override
         public void run() {
             long prevTime = 0;
+            boolean loaderIsEnabled = false;
             boolean shooterIsEnabled = false;
             while (opModeIsActive()) {
                 if (shooterIsEnabled) {
@@ -239,20 +238,20 @@ public class drive extends LinearOpMode {
                     prevTime = System.currentTimeMillis();
                     shooterIsEnabled = true;
                 }
-            }
-        }
-    };
-    Runnable shooterLoaderRun = new Runnable() {
-        @Override
-        public void run() {
-            long prevTime = 0;
-            while (opModeIsActive()) {
+
+                // Shooter Loader.
                 if (gamepad2.y && ((System.currentTimeMillis() - 400) > prevTime)) {
-                    shooterLoader.setPosition(1);
                     prevTime = System.currentTimeMillis();
-                    while ((System.currentTimeMillis() - 800) < prevTime) {
+                    shooterLoader.setDirection(CRServo.Direction.FORWARD);
+                    if(loaderIsEnabled) {
+                        shooterLoader.setPower(0);
+                        loaderIsEnabled = false;
+                    } else {
+                        shooterLoader.setPower(5);
+                        loaderIsEnabled = true;
                     }
-                    shooterLoader.setPosition(0);
+
+
                 }
             }
         }
