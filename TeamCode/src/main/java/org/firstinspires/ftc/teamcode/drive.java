@@ -39,6 +39,9 @@ public class drive extends LinearOpMode {
     private double globalpowerfactor = 0.8;
     private DcMotor collector = null;
     private DcMotor shooter = null;
+    private final static double SLHOME=0.0; //starting pos
+    private final static double SLMINR=0.0; //smallest pos
+    private final static double SLMAXR=1.0; //bigger pos
     BNO055IMU imu;
     Orientation angles;
     Acceleration gravity;
@@ -56,7 +59,8 @@ public class drive extends LinearOpMode {
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         collector = hardwareMap.get(DcMotor.class, "collector");
-        shooterLoader = hardwareMap.get(Servo.class, "shooterloader");
+        shooterLoader = hardwareMap.get(Servo.class, "shooterLoader");
+        shooterLoader.setPosition(SLHOME);
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
         telemetry.addData("Status", "Initialized");
@@ -88,9 +92,11 @@ public class drive extends LinearOpMode {
         Thread shooterThread = new Thread(shooterRun);
         Thread collectorThread = new Thread(collectRun);
         Thread driveThread = new Thread(driverRun);
+        Thread shooterLoaderThread = new Thread(shooterLoaderRun);
         driveThread.start();
         collectorThread.start();
         shooterThread.start();
+        shooterLoaderThread.start();
         while (opModeIsActive()) {
 
 
@@ -100,6 +106,7 @@ public class drive extends LinearOpMode {
 
         }
     }
+
 
     Runnable driverRun = new Runnable() {
         @Override
@@ -141,7 +148,7 @@ public class drive extends LinearOpMode {
 
     /*Runnable imuRead = new Runnable() {
         @Override
-        public void run() {                            // mAke function
+        public void run() {                            // Make function
             while (opModeIsActive()) {
                 angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
                 telemetry.addLine() .addData("Z Coordinate (Rotation)", formatAngle(AngleUnit.DEGREES, angles.firstAngle));
@@ -231,6 +238,21 @@ public class drive extends LinearOpMode {
                 if (gamepad2.right_bumper && (System.currentTimeMillis() - 500 > prevTime)) {
                     prevTime = System.currentTimeMillis();
                     shooterIsEnabled = true;
+                }
+            }
+        }
+    };
+    Runnable shooterLoaderRun = new Runnable() {
+        @Override
+        public void run() {
+            long prevTime = 0;
+            while (opModeIsActive()) {
+                if (gamepad2.y && ((System.currentTimeMillis() - 400) > prevTime)) {
+                    shooterLoader.setPosition(1);
+                    prevTime = System.currentTimeMillis();
+                    while ((System.currentTimeMillis() - 800) < prevTime) {
+                    }
+                    shooterLoader.setPosition(0);
                 }
             }
         }
