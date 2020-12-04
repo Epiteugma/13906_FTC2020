@@ -15,8 +15,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import java.util.Locale;
 
-@Autonomous(name = "Autonomous Test", group = "FTC_Cyprus_2020-21")
+@Autonomous(name = "Autonomous", group = "FTC_Cyprus_2020-21")
 public class autonomous extends LinearOpMode {
+    VuforiaLocalizer vuforiaLocalizer;
+    VuforiaLocalizer.Parameters parameters;
+    VuforiaTrackabbles visionTarget;
+    VuforiaTrackable target;
+    VuforiaTrackableDefaultListener llistener;
+
+    OpenGLMatrix lastKnownLoaction;
+    OpenGLMatrix phoneLoaction;
+
+    public static final String AXMZ1Sj/////AAABmUx9MvSm30+BhSsSC99gi4Ujtkus2hJIZS0gVIZQUeSPEcIITEOnwlBZpbMvw9zEBpF7fu28GyAgYY3vGjDNcFcyeuEhKSKJ1A4URgGWeqJJ5HsA+2K1fJY7zhgBTjNt5it80mzhs7y2Jba1Vsjxe4LtVWSgWyzHalth1+aky0tEE9ALjWeuE/3RV/fUMgO2QPbjYg8UvPEjZLhFwSLVhf/ku23jTE1JDtmfZCgdrCCYGhdvuMCBEzIijVf8HyhxaWWtnhYZi77RcaDQdKQURAcuSpM5HRRygLkoFZ8B9mjEcFxkxQ4rJFZFb4xN2j2XXPurSl70Ht7IAQLIiJDJAAY2LdLzDggUZlNhp2LY8TrI
     BNO055IMU imu;
     Orientation angles;
     @Override
@@ -24,6 +34,16 @@ public class autonomous extends LinearOpMode {
         // Set up the parameters with which we will use our IMU. Note that integration
         // algorithm here just reports accelerations to the logcat log; it doesn't actually
         // provide positional information.
+        parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
+        parameters.vuforiaLicenseKey = AXMZ1Sj/////AAABmUx9MvSm30+BhSsSC99gi4Ujtkus2hJIZS0gVIZQUeSPEcIITEOnwlBZpbMvw9zEBpF7fu28GyAgYY3vGjDNcFcyeuEhKSKJ1A4URgGWeqJJ5HsA+2K1fJY7zhgBTjNt5it80mzhs7y2Jba1Vsjxe4LtVWSgWyzHalth1+aky0tEE9ALjWeuE/3RV/fUMgO2QPbjYg8UvPEjZLhFwSLVhf/ku23jTE1JDtmfZCgdrCCYGhdvuMCBEzIijVf8HyhxaWWtnhYZi77RcaDQdKQURAcuSpM5HRRygLkoFZ8B9mjEcFxkxQ4rJFZFb4xN2j2XXPurSl70Ht7IAQLIiJDJAAY2LdLzDggUZlNhp2LY8TrI
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK
+        vuforiaLocalizer = ClassFactory.createVuforiaLocalizer(parameters);
+
+        visionTargets = vuforiaLocalizer.loadTrackablesFromAsset("FTC_2020_2021");
+
+        target =vuforiaTargets.get(0);
+        target.setName("Wheels Target");
+        target.setLocation.(createmix())
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
