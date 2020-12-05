@@ -32,6 +32,10 @@ public class autonomous extends LinearOpMode {
     VuforiaTrackable target;
     VuforiaTrackableDefaultListener listener;
 
+    float robotX = 0;
+    float robotY = 0;
+    float robotAngle = 0;
+
     OpenGLMatrix lastKnownLocation;
     OpenGLMatrix phoneLocation;
 
@@ -44,9 +48,6 @@ public class autonomous extends LinearOpMode {
         // provide positional information.
         setupVuforia();
         lastKnownLocation = createMatrix(0, 0, 0, 0, 0, 0);
-        float robotX = 0;
-        float robotY = 0;
-        float robotAngle = 0;
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -65,6 +66,7 @@ public class autonomous extends LinearOpMode {
         final DcMotor bl = hardwareMap.get(DcMotor.class, "back_left");
         final DcMotor br = hardwareMap.get(DcMotor.class, "back_right");
         waitForStart();
+        visionTargets.activate();
         while(opModeIsActive()) {
             // Ask the listener for the latest information on where the robot is
             OpenGLMatrix latestLocation = listener.getUpdatedRobotLocation();
@@ -124,17 +126,16 @@ public class autonomous extends LinearOpMode {
     /////////////////////////////////////
     //            FORMATTING           //
     /////////////////////////////////////
-
+    private OpenGLMatrix createMatrix(float x, float y, float z, float u, float v, float w) {
+        return OpenGLMatrix.translation(x, y, z)
+                .multiplied(Orientation.getRotationMatrix(
+                        AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES, u, v, w));
+    }
     private String formatMatrix(OpenGLMatrix matrix) {
         return matrix.formatAsTransform();
     }
     String formatAngle(AngleUnit angleUnit, double angle) {
         return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
-    }
-    private OpenGLMatrix createMatrix(float x, float y, float z, float u, float v, float w) {
-        return OpenGLMatrix.translation(x, y, z)
-                .multiplied(Orientation.getRotationMatrix(
-                        AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES, u, v, w));
     }
     String formatDegrees(double degrees){
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
