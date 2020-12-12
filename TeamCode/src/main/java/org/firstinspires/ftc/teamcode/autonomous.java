@@ -112,7 +112,16 @@ public class autonomous extends LinearOpMode {
 
         // Setup the target to be tracked
         target = visionTargets.get(0);
-        target.setName("Target");
+        target.setName("BlueTowerGoal");
+        target = visionTargets.get(1);
+        target.setName("RedTowerGoal");
+        target = visionTargets.get(2);
+        target.setName("RedAlliance");
+        target = visionTargets.get(3);
+        target.setName("BlueAlliance");
+        target = visionTargets.get(4);
+        target.setName("FrontWall");
+
         target.setLocation(createMatrix(0, 500, 0, 90, 0, 90));
 
         // Set phone location on robot
