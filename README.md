@@ -1,11 +1,17 @@
 ## Team 13906's Official Repo for FTC 2020-2021
 
 Progress Tracker:
-
-- Movement code ✅
-- Servo mechanism support ✅
-- Collector mechanism support ✅
-- Shooting mechanism support ✅
-- Autonomous mode (30s) ❌
+## Driver controlled period (120s) ❌ {
+ - Movement code and acceleration/deceleration ✅
+ - Shooterloader mechanism support ✅
+ - Collector mechanism support ✅
+ - Shooting mechanism support ✅
+ - minor bug fixes and efficiency ❌
+ }
+## Autonomous mode (30s) ❌ {
+ - Vuforia Engine ✅
+ - basic gameplay ❌
+ - minor bug fixes and efficiency ❌
+}
 
 <img src="https://media1.giphy.com/media/3o7btQ0NH6Kl8CxCfK/giphy.gif" width="550" height="250" />

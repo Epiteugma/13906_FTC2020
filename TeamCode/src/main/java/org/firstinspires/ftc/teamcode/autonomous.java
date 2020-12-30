@@ -181,7 +181,7 @@ public class autonomous extends LinearOpMode {
             targetVisible = false;
             for (VuforiaTrackable trackable : allTrackables) {
                 if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
-                    telemetry.addData("The Current Visible Target", trackable.getName());
+                    telemetry.addData("The Current Visible Target:", trackable.getName());
                     targetVisible = true;
 
                     OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
@@ -206,7 +206,7 @@ public class autonomous extends LinearOpMode {
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
             }
             else {
-                telemetry.addData("Visible Target", "There is no visible target!");
+                telemetry.addData("Visible Target:", "There is no visible target!");
             }
             telemetry.update();
         }

@@ -40,16 +40,10 @@ public class drive extends LinearOpMode {
     private double globalpowerfactor = 0.8;
     private DcMotor collector = null;
     private DcMotor shooter = null;
-    private final static double SLHOME=0.0; //starting pos
-    private final static double SLMINR=0.0; //smallest pos
-    private final static double SLMAXR=1.0; //bigger pos
     BNO055IMU imu;
     Orientation angles;
     Acceleration gravity;
 
-    /*
-     * Code to run ONCE when the driver hits INIT
-     */
     @Override
     public void runOpMode() {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
