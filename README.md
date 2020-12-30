@@ -3,7 +3,7 @@
 Progress Tracker:
 
 - Movement code ✅
-- "Gearbox" mechanism support ✅
+- Servo mechanism support ✅
 - Collector mechanism support ✅
 - Shooting mechanism support ✅
 - Autonomous mode (30s) ❌

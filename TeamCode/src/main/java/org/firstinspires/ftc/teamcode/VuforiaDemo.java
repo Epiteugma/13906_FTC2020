@@ -34,29 +34,29 @@ public class VuforiaDemo extends LinearOpMode {
 
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // Conversions
-    private static final float mmPerInch = 25.4f;
+    private static final float mmPerInch= 25.4f;
     private static final float mmTargetHeight = (6) * mmPerInch;          // the height of the center of the target image above the floor
     private static final float halfField = 72 * mmPerInch;
     private static final float quadField = 36 * mmPerInch;
     private OpenGLMatrix lastLocation = null;
     private VuforiaLocalizer vuforia = null;
-   // WebcamName webcamName = null;
+    WebcamName webcamName = null;
     private boolean targetVisible = false;
     private float phoneXRotate    = 0;
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
 
     @Override public void runOpMode() {
-     //   webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         //setcamera
-        //parameters.cameraName = webcamName;
+        parameters.cameraName = webcamName;
         // Make sure extended tracking is disabled it just adds extra load without any reason!
         parameters.useExtendedTracking = false;
 
-        //  Instantiate the Vuforia engine
+        // Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
         //This data is loaded from the assets folder!
@@ -137,7 +137,7 @@ public class VuforiaDemo extends LinearOpMode {
             targetVisible = false;
             for (VuforiaTrackable trackable : allTrackables) {
                 if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
-                    telemetry.addData("Visible Target", trackable.getName());
+                    telemetry.addData("The Current Visible Target", trackable.getName());
                     targetVisible = true;
 
                     OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
@@ -160,7 +160,7 @@ public class VuforiaDemo extends LinearOpMode {
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
             }
             else {
-                telemetry.addData("Visible Target", "none");
+                telemetry.addData("Visible Target", "There is no visible target!");
             }
             telemetry.update();
         }
