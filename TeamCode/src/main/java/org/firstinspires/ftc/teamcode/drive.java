@@ -21,14 +21,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import java.lang.Runnable;
 import java.util.Locale;
 
-
-
 @TeleOp(name="Basic: Iterative OpMode-13906", group="FTC_Cyprus_2020-21")
 
-
-
 public class drive extends LinearOpMode {
-
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -74,9 +69,8 @@ public class drive extends LinearOpMode {
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-//        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-//        rightDrive.setDirection(DcMotor.Direction.REVERSE);
-
+        //leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        // rightDrive.setDirection(DcMotor.Direction.REVERSE);
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
 
@@ -99,7 +93,6 @@ public class drive extends LinearOpMode {
         }
     }
 
-
     Runnable driverRun = new Runnable() {
         @Override
         public void run() {
@@ -117,7 +110,7 @@ public class drive extends LinearOpMode {
                 fr.setPower(-(forwardpower - sidepower - turnpower));
                 br.setPower(-(forwardpower + sidepower - turnpower));
 
-                // Do gearbox increase.
+                // Calculate and do gearbox increase.
                 if (gamepad1.y && (System.currentTimeMillis() - 500 > prevTime)) {
                     prevTime = System.currentTimeMillis();
                     if ((globalpowerfactor + 0.1) < 1) {
@@ -125,7 +118,7 @@ public class drive extends LinearOpMode {
                     }
                 }
 
-
+                //Increase or decease overall machine power
                 if (gamepad1.a && (System.currentTimeMillis() - 500 > prevTime)) {
                     prevTime = System.currentTimeMillis();
                     if ((globalpowerfactor - 0.1) > 0) {
@@ -134,7 +127,6 @@ public class drive extends LinearOpMode {
                 }
             }
         }
-
 
     };
 
@@ -160,14 +152,6 @@ public class drive extends LinearOpMode {
                 if (collectorIsEnabled) {
                     if (collectorDirection == CollectorDirection.BACK) {
                         collector.setPower(1);
-//                        long prevpostime = System.currentTimeMillis();
-//                        int prevpos = collector.getCurrentPosition();
-//                        if (collector.getCurrentPosition() > prevpos) {
-//                            double collectrpower = calculateshooterpower(prevpostime, System.currentTimeMillis(), 288, 70, 0.1, 0.5);
-//                            collector.setPower(collectrpower);
-//                            prevpos = collector.getCurrentPosition();
-//                            prevpostime = System.currentTimeMillis();
-//                        }
                     } else if (collectorDirection == CollectorDirection.FORWARD) {
                         collector.setPower(-1);
                     } else {
@@ -250,7 +234,6 @@ public class drive extends LinearOpMode {
             }
         }
     };
-
 
     /////////////////////////////////////
     //            FORMATTING           //

@@ -6,12 +6,12 @@ Progress Tracker:
  - Shooterloader mechanism support ✅
  - Collector mechanism support ✅
  - Shooting mechanism support ✅
- - minor bug fixes and efficiency ❌
+ - minor bug fixes (efficiency,controls,crashes) ❌
  }
 ## Autonomous mode (30s) ❌ {
  - Vuforia Engine ✅
  - basic gameplay ❌
- - minor bug fixes and efficiency ❌
+ - minor bug fixes (efficiency,controls,crashes) ❌
 }
 
 <img src="https://media1.giphy.com/media/3o7btQ0NH6Kl8CxCfK/giphy.gif" width="550" height="250" />
