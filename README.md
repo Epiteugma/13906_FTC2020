@@ -1,6 +1,6 @@
-## Team 13906's Official Repo for FTC 2020-2021
+# Team Epiteugma Revved Up 13906 FTC 2020-2021 Ultimate Goal
 
-Progress Tracker:
+#Progress Tracker:
 ## Driver controlled period (120s) ❌ {
  - Movement code and acceleration/deceleration ✅
  - Shooterloader mechanism support ✅
